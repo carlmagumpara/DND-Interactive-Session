@@ -30,15 +30,17 @@ function App() {
     }
   ]);
   const [selected_item, setSelectedItem] = useState(null);
+  const [drag_over, setDragOver] = useState(null);
 
+  // Drop Zone
   // onDrop -> parent div
   // onDragOver -> parent div
+  // onDragLeave -> parent div
 
+  // Drag Item
   // draggable -> child div
   // onDragStart -> child div
   // onDragEnd -> child div
-
-  console.log(selected_item);
 
   return (
     <Container className="pt-5">
@@ -47,7 +49,14 @@ function App() {
           <p>Undone</p>
           <ListGroup
             className="pt-5 pb-5"
-            onDragOver={e => e.preventDefault()}
+            onDragOver={e => {
+              setDragOver('Undone');
+              e.preventDefault();
+            }}
+            onDragLeave={e => {
+              setDragOver(null);
+              e.preventDefault();
+            }}
             onDrop={e => {
               const id = parseInt(e.dataTransfer.getData('Text')); // get dataTransfer data
               const _todos = [...todos]; // copy to make it mutable
@@ -55,8 +64,10 @@ function App() {
               _todos[index].status = 'Undone'; // set status
               setTodos(_todos); // update todos state
               setSelectedItem(null); // reset selected item
+              setDragOver(null); // reset drag over
             }}
           >
+            {drag_over === 'Undone' ? <p>Drop Here</p> : null}
             {todos.filter(item => item.status === 'Undone').map(item => (
               <ListGroup.Item
                 key={item.id}
@@ -65,8 +76,11 @@ function App() {
                   e.dataTransfer.setData('Text', item.id); // hold the value to another element, its like context API
                   setSelectedItem(item);
                 }}
-                onDragEnd={() => alert('end')}
-                style={{ border: item.id === selected_item?.id ? '1px solid red' : 'none' }}
+                onDragEnd={() => {
+                  setSelectedItem(null);
+                  setDragOver(null);
+                }}
+                style={{ border: item.id === selected_item?.id ? '1px solid red' : '1px solid transparent' }}
               >
                 {item.todo}
               </ListGroup.Item>
@@ -77,7 +91,14 @@ function App() {
           <p>Done</p>
           <ListGroup
             className="pt-5 pb-5"
-            onDragOver={e => e.preventDefault()}
+            onDragOver={e => {
+              setDragOver('Done');
+              e.preventDefault();
+            }}
+            onDragLeave={e => {
+              setDragOver(null);
+              e.preventDefault();
+            }}
             onDrop={e => {
               const id = parseInt(e.dataTransfer.getData('Text')); // get dataTransfer data
               const _todos = [...todos]; // copy to make it mutable
@@ -85,8 +106,10 @@ function App() {
               _todos[index].status = 'Done'; // set status
               setTodos(_todos); // update todos state
               setSelectedItem(null); // reset selected item
+              setDragOver(null); // reset drag over
             }}
           >
+            {drag_over === 'Done' ? <p>Drop Here</p> : null}
             {todos.filter(item => item.status === 'Done').map(item => (
               <ListGroup.Item
                 key={item.id}
@@ -95,8 +118,11 @@ function App() {
                   e.dataTransfer.setData('Text', item.id); // hold the value to another element, its like context API
                   setSelectedItem(item);
                 }}
-                onDragEnd={() => setSelectedItem(null)}
-                style={{ border: item.id === selected_item?.id ? '1px solid red' : 'none' }}
+                onDragEnd={() => {
+                  setSelectedItem(null);
+                  setDragOver(null);
+                }}
+                style={{ border: item.id === selected_item?.id ? '1px solid red' : '1px solid transparent' }}
               >
                 {item.todo}
               </ListGroup.Item>
